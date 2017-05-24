@@ -1,11 +1,11 @@
 {
    "gnu": {
-      "version": "gcc/5.1.0"
+      "version": "gcc/5.3.0"
    }
   "intel": {
-      "version": "intel/15.0.2.164"
+      "version": "intel/16.0.3.210"
    }
   "pgi": {
-      "version": "pgi/15.3.0"
+      "version": "pgi/16.5.0"
    }
 }
