@@ -23,7 +23,7 @@ noop =
 rel_path = $(subst $(noop) $(noop),,$(patsubst %,../,$(call slash_to_list,$(1))))
 
 manifest.mk:
-	bash MOM6-examples/tools/tests/GFDL-Gitlab-MOM6/generate_manifest.sh > manifest.mk
+	bash Gitlab/generate_manifest.sh > manifest.mk
 
 # Running
 include manifest.mk
@@ -34,7 +34,7 @@ MEMORY ?= dynamic
 ifeq ($(MEMORY),static)
 # Static pathway for building ocean.stats.*
 define run-static-model
-$(CONFIGS)/%/ocean.stats.$(1):
+$(CONFIGS)/%/ocean.stats.$(1): $(CONFIGS)/%/input.nml $(CONFIGS)/%/MOM_input $(CONFIGS)/%/MOM_override
 	echo $(BUILD)/$(1)/$$(MODE)/static/$$*/MOM6"("$$(STATIC_NPES)")" "=>" $$@
 	cd $$(@D) && rm -rf Depth_list.nc CPU_stats.$(1) time_stamp.out $$(@F) RESTART && mkdir RESTART
 	cd $$(@D) && tic=$$$$(date +%s) && \
@@ -52,7 +52,7 @@ $(foreach c,$(COMPILERS),$(eval $(call generate-targets,$(c))))
 else
 # Static pathway for building ocean.stats.*
 define run-dynamic-model
-$(CONFIGS)/$(2)/%/ocean.stats.$(1): $(BUILD)/$(1)/$$(MODE)/$$(MEMORY)/$(2)/MOM6
+$(CONFIGS)/$(2)/%/ocean.stats.$(1): $(BUILD)/$(1)/$$(MODE)/$$(MEMORY)/$(2)/MOM6 $(CONFIGS)/$(2)/%/input.nml $(CONFIGS)/$(2)/%/MOM_input $(CONFIGS)/$(2)/%/MOM_override
 	echo $(BUILD)/$(1)/$$(MODE)/$$(MEMORY)/$(2)/MOM6"("$$(NPES)")" "=>" $$@
 	cd $$(@D) && rm -rf Depth_list.nc CPU_stats.$(1) time_stamp.out $$(@F) RESTART && mkdir RESTART
 	cd $$(@D) && tic=$$$$(date +%s) && \

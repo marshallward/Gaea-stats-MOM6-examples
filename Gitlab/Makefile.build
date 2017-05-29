@@ -104,7 +104,6 @@ $(BUILD)/%/$(1)$(2): $(BUILD)/%/$(1)Makefile $(foreach l,$(4),$(BUILD)/%/$(l))
 	@echo Building $$@
 	cd $$(@D); source $(3) && make NETCDF=3 $$(call make_args, $$(call fms_mode, $$@)) $$(@F) $(LOG)
 endef
-#cd $$(@D); source $(3) && HDF5_DISABLE_VERSION_CHECK=2 make NETCDF=3 $$(call make_args, $$(call fms_mode, $$@)) $$(@F) $(LOG)
 
 # build/compiler/mode/fms/libfms.a
 $(BUILD)/%/fms/path_names: LIST_PATHS_ARGS = $(FMS_SRC)/
@@ -170,7 +169,6 @@ $(BUILD)/%/sis1/Makefile: MKMF_OPTS = -p libsis1.a -o '-I../fms -I../icebergs -I
 $(eval $(call compile,sis1/,libsis1.a,../../env,fms/libfms.a))
 
 # build/compiler/mode/sis2/libsis2.a
-$(BUILD)/%/sis2/path_names: LIST_PATHS_ARGS += $(SIS2_SRC)/ $(MOM6_SRC)/src/framework/MOM_memory_macros.h
 $(BUILD)/%/sis2/Makefile: MKMF_OPTS = -p libsis2.a -o '-I../../fms -I../mom6 -I../../icebergs -I../../ice_ocean_extras' -c '$(CPP_DEFS)'
 $(eval $(call compile,sis2/,libsis2.a,../../../env,mom6/libmom6.a))
 
@@ -185,7 +183,8 @@ $(eval $(call compile,,MOM6,$$(ENV_SCRIPT),))
 # Generate lists of variables and dependencies for SIS2 libraries
 # $(1) = compiler, $(2) = mode, $(3) = memory style, $(4) = mom6 configuration
 define sis2-variables
-$(BUILD)/$(1)/$(2)/$(3)/$(4)/path_names: $(SIS2_SRC)/*
+$(BUILD)/$(1)/$(2)/$(3)/$(4)/path_names: $(SIS2_SRC)/src/* $(SIS2_SRC)/config_src/$(3)/* $(MOM6_SRC)/src/framework/MOM_memory_macros.h
+$(BUILD)/$(1)/$(2)/$(3)/$(4)/path_names: LIST_PATHS_ARGS = $(SIS2_SRC)/src/ $(SIS2_SRC)/config_src/$(3)/ $(MOM6_SRC)/src/framework/MOM_memory_macros.h
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/Makefile: CPP_DEFS = -D_FILE_VERSION="`../../../../../$(MKMF_SRC)/bin/git-version-string $$$$<`" -DSTATSLABEL=\"$(STATS_PLATFORM)$(1)$(STATS_COMPILER_VER)\"
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/libsis2.a: $(BUILD)/$(1)/$(2)/icebergs/libicebergs.a $(BUILD)/$(1)/$(2)/ice_ocean_extras/libice_ocean_extras.a
 .SECONDARY: $(BUILD)/$(1)/$(2)/$(3)/$(4)/path_names
