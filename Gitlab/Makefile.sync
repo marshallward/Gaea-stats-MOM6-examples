@@ -1,6 +1,13 @@
 
 ALL_FILES = $(shell git ls-files regressions)
+GNU_FILES = $(shell git ls-files regressions | grep gnu)
 all: $(ALL_FILES)
+	git status regressions
+gnu: $(GNU_FILES)
+	git status regressions
+intel: $(subst gnu,intel,$(GNU_FILES))
+	git status regressions
+pgi: $(subst gnu,pgi,$(GNU_FILES))
 	git status regressions
 
 define sync-stats

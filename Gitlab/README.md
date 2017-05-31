@@ -7,7 +7,15 @@
 
 ## Initial setup
 
+Either recursively clone this repository with:
 ```bash
+git clone --recursive git@gitlab.gfdl.noaa.gov:ogrp/Gaea_c3-stats-MOM6-examples.git
+```
+
+or clone then manually update:
+```bash
+git clone --recursive git@gitlab.gfdl.noaa.gov:ogrp/Gaea_c3-stats-MOM6-examples.git
+cd Gaea_c3-stats-MOM6-examples
 make -f Gitlab/Makefile.clone clone
 ```
 or
@@ -35,17 +43,19 @@ make -f Gitlab/Makefile.build build_pgi -s -j
 ## Run model
 
 ```bash
-make -f Gitlab/Makefile.run gnu_all -s -j
-make -f Gitlab/Makefile.run intel_all -s -j
-make -f Gitlab/Makefile.run pgi_all -s -j
-```
-
-or 
-```bash
 make -f Gitlab/Makefile.run gnu_all MEMORY=dynamic_symmetric -s -j
 make -f Gitlab/Makefile.run intel_all MEMORY=dynamic_symmetric -s -j
 make -f Gitlab/Makefile.run pgi_all MEMORY=dynamic_symmetric -s -j
 ```
+should yield a clean MOM6-examples (uses that correct layouts).
+
+Test the non-symmetric executables
+```bash
+make -f Gitlab/Makefile.run gnu_all -s -j
+make -f Gitlab/Makefile.run intel_all -s -j
+make -f Gitlab/Makefile.run pgi_all -s -j
+```
+will produce difference MOM_parameter_doc.layout files in MOM6-examples but with the right answers.
 
 or 
 ```bash
@@ -56,5 +66,11 @@ make -f Gitlab/Makefile.run pgi_static_ocean_only MEMORY=static -s -j
 
 ## Copy results to regressions/
 ```bash
-make -f Gitlab/Makefile.sync -s
+make -f Gitlab/Makefile.sync -s -k
 ```
+will sync the newly generated ocean/seaice.stats files and report their status.
+
+```bash
+make -f Gitlab/Makefile.sync -s -k gnu
+```
+will sync only the gnu stats files.
