@@ -5,8 +5,8 @@ echo -n "Before script started at " && date
 env > gitlab_session.log
 
 # Assumes running in Gaea-stats-MOM6-examples regression repo
-# Reset MOM6-examples to dev/master
-(cd MOM6-examples && git checkout . && git checkout dev/master && git pull && git submodule init && git submodule update)
+# Reset MOM6-examples to dev/gfdl
+(cd MOM6-examples && git checkout . && git checkout dev/gfdl && git pull && git submodule init && git submodule update)
 
 # Pre-process land and set up link to datasets
 test -d MOM6-examples/src/LM3 || make -f Gitlab/Makefile.clone clone_gfdl -s
