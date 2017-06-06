@@ -65,7 +65,7 @@ $(SRC_DIR)/atmos_param_am3: TAG = $(CITY_TAG)
 $(SRC_DIR)/ice_param: URL = http://gitlab.gfdl.noaa.gov/fms/ice_param.git
 $(SRC_DIR)/ice_param: TAG = $(CITY_TAG)
 $(SRC_DIR)/sis1: URL = http://gitlab.gfdl.noaa.gov/fms/ice_sis.git
-$(SRC_DIR)/sis1: TAG = $(CITY_TAG)
+$(SRC_DIR)/sis1: TAG = 2be67d1a7d54be5da2f
 $(foreach r,AM2/atmos_shared_am3 AM2/atmos_drivers AM2/atmos_fv_dynamics sis1 LM3/land_param LM3/land_lad2 atmos_param_am3 ice_param,$(SRC_DIR)/$(r)): | $(SRC_DIR)
 	test -d $@ && (cd $@; git fetch) || git clone $(CLONE_OPTS) $(URL) $@
 	cd $@; git checkout $(TAG)
