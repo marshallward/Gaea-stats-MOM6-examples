@@ -38,7 +38,8 @@ $(CONFIGS)/%/ocean.stats.$(1): $(CONFIGS)/%/input.nml $(CONFIGS)/%/MOM_input $(C
 	echo $(BUILD)/$(1)/$$(MODE)/static/$$*/MOM6"("$$(STATIC_NPES)")" "=>" $$@
 	cd $$(@D) && rm -rf Depth_list.nc CPU_stats.$(1) time_stamp.out $$(@F) RESTART && mkdir RESTART
 	cd $$(@D) && tic=$$$$(date +%s) && \
-	OMP_NUM_THREADS=1 KMP_STACKSIZE=512m NC_BLKSZ=1M time $(MPIRUN) -n $$(STATIC_NPES) $$(call rel_path,$$(@D))$(BUILD)/$(1)/$$(MODE)/static/$$*/MOM6 > log.$(1).out && \
+	(OMP_NUM_THREADS=1 KMP_STACKSIZE=512m NC_BLKSZ=1M time $(MPIRUN) -n $$(STATIC_NPES) $$(call rel_path,$$(@D))$(BUILD)/$(1)/$$(MODE)/static/$$*/MOM6 > log.$(1).out;) \
+	2>&1 | sed 's,^,$$@: ,' && toc=$$$$(date +%s) && echo $$$$(($$$$toc-$$$$tic)) > walltime.$(1).out
 	toc=$$$$(date +%s) && echo $$$$(($$$$toc-$$$$tic)) > walltime.$(1).out
 endef
 $(foreach c,gnu intel pgi,$(eval $(call run-static-model,$(c))))
@@ -56,8 +57,8 @@ $(CONFIGS)/$(2)/%/ocean.stats.$(1): $(BUILD)/$(1)/$$(MODE)/$$(MEMORY)/$(2)/MOM6 
 	echo $(BUILD)/$(1)/$$(MODE)/$$(MEMORY)/$(2)/MOM6"("$$(NPES)")" "=>" $$@
 	cd $$(@D) && rm -rf Depth_list.nc CPU_stats.$(1) time_stamp.out $$(@F) RESTART && mkdir RESTART
 	cd $$(@D) && tic=$$$$(date +%s) && \
-	OMP_NUM_THREADS=1 KMP_STACKSIZE=512m NC_BLKSZ=1M time $(MPIRUN) -n $$(NPES) $$(call rel_path,$$(@D))$(BUILD)/$(1)/$$(MODE)/$$(MEMORY)/$(2)/MOM6 > log.$(1).out && \
-	toc=$$$$(date +%s) && echo $$$$(($$$$toc-$$$$tic)) > walltime.$(1).out
+	(OMP_NUM_THREADS=1 KMP_STACKSIZE=512m NC_BLKSZ=1M time $(MPIRUN) -n $$(NPES) $$(call rel_path,$$(@D))$(BUILD)/$(1)/$$(MODE)/$$(MEMORY)/$(2)/MOM6 > log.$(1).out;) \
+	2>&1 | sed 's,^,$$@: ,' && toc=$$$$(date +%s) && echo $$$$(($$$$toc-$$$$tic)) > walltime.$(1).out
 endef
 $(foreach c,gnu intel pgi,$(foreach o,ocean_only ice_ocean_SIS2 land_ice_ocean_LM3_SIS2 coupled_AM2_LM3_SIS coupled_AM2_LM3_SIS2,$(eval $(call run-dynamic-model,$(c),$(o)))))
 
