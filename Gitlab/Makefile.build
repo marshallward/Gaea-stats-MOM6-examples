@@ -102,7 +102,7 @@ define compile
 $(BUILD)/%/$(1)$(2): $(BUILD)/%/$(1)Makefile $(foreach l,$(4),$(BUILD)/%/$(l))
 	rm -f $$@
 	@echo Building $$@
-	cd $$(@D); source $(3) && make NETCDF=3 $$(call make_args, $$(call fms_mode, $$@)) $$(@F) $(LOG)
+	cd $$(@D); (source $(3) && make NETCDF=3 $$(call make_args, $$(call fms_mode, $$@)) $$(@F) $(LOG)) 2>&1 | sed 's,^,$$@: ,' | egrep -v 'command line warning #10120'
 endef
 
 # build/compiler/mode/fms/libfms.a
