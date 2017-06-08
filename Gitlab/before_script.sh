@@ -13,6 +13,7 @@ test -d MOM6-examples/src/LM3 || make -f Gitlab/Makefile.clone clone_gfdl -s
 make -f Gitlab/Makefile.clone MOM6-examples/.datasets -s
 
 # Build a manifest of runs to make with PE counts
+rm manifest.mk
 bash Gitlab/generate_manifest.sh > manifest.mk
 
 echo -n "Before script finished at " && date
