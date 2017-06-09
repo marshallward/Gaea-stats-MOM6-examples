@@ -40,7 +40,7 @@ echo -n "Symmetric runs finished at " && date
 EOF
 
 echo -n "Run stage waiting for submitted job as of " && date
-msub -l partition=c3,nodes=15,walltime=00:34:00,qos=norm -q debug -S /bin/tcsh -j oe -A gfdl_o -z -o job.log -N mom6_regression -K job.sh
+msub -l partition=c3,nodes=29,walltime=00:17:00,qos=norm -q debug -S /bin/tcsh -j oe -A gfdl_o -z -o job.log -N mom6_regression -K job.sh
 
 # Show output
 echo -n "Submitted job returned control at " && date
