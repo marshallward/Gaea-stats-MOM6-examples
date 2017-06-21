@@ -20,6 +20,9 @@ do
       npes=$(($npes+$atmos_npes))
     fi
     echo $e/ocean.stats.%: NPES=$npes
+    echo $e/01.ignore/ocean.stats.%: NPES=$npes
+    echo $e/12.ignore/ocean.stats.%: NPES=$npes
+    echo $e/02.ignore/ocean.stats.%: NPES=$npes
     if [[ "$npes" -gt "1" && "${#masktable}" -eq "0" && "${#atmos_npes}" -eq 0 ]]; then
       alt_npes=$(($npes-1))
       echo $e/ocean.stats.%: ALT_NPES=$alt_npes
@@ -32,4 +35,4 @@ do
     echo $e/ocean.stats.%: STATIC_NPES=$npes
 done
 
-echo "STATIC_OCEAN_ONLY =" `find MOM6-examples/ocean_only -type d -exec bash -c '[ -f "$0"/MOM_memory.h ] && [ -f "$0"/ocean.stats.gnu ]' '{}' \; -print`
+echo "STATIC_OCEAN_ONLY = DOME nonBous_global benchmark double_gyre"

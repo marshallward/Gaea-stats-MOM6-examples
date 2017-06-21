@@ -47,7 +47,7 @@ make -f Gitlab/Makefile.run gnu_all MEMORY=dynamic_symmetric -s -j
 make -f Gitlab/Makefile.run intel_all MEMORY=dynamic_symmetric -s -j
 make -f Gitlab/Makefile.run pgi_all MEMORY=dynamic_symmetric -s -j
 ```
-should yield a clean MOM6-examples (uses that correct layouts).
+should yield a clean MOM6-examples (uses the correct layouts).
 
 Test the non-symmetric executables
 ```bash
@@ -74,3 +74,18 @@ will sync the newly generated ocean/seaice.stats files and report their status.
 make -f Gitlab/Makefile.sync -s -k gnu
 ```
 will sync only the gnu stats files.
+
+
+## Test restarts
+
+```bash
+make -f Gitlab/Makefile.restart gnu_ocean_only -s -j RESTART_STAGE=02
+make -f Gitlab/Makefile.restart gnu_ocean_only -s -j RESTART_STAGE=01
+make -f Gitlab/Makefile.restart gnu_ocean_only -s -j RESTART_STAGE=12
+make -f Gitlab/Makefile.restart gnu_ice_ocean_SIS2 -s -j RESTART_STAGE=02
+make -f Gitlab/Makefile.restart gnu_ice_ocean_SIS2 -s -j RESTART_STAGE=01
+make -f Gitlab/Makefile.restart gnu_ice_ocean_SIS2 -s -j RESTART_STAGE=12
+make -f Gitlab/Makefile.restart restart_gnu_ocean_only -s -j
+make -f Gitlab/Makefile.restart restart_gnu_ice_ocean_SIS2 -s -j
+```
+Last commands alone is sufficient but seems more susceptible to lustre file systems flakiness.

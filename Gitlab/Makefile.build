@@ -103,6 +103,7 @@ $(BUILD)/%/$(1)$(2): $(BUILD)/%/$(1)Makefile $(foreach l,$(4),$(BUILD)/%/$(l))
 	rm -f $$@
 	@echo Building $$@
 	cd $$(@D); (source $(3) && make NETCDF=3 $$(call make_args, $$(call fms_mode, $$@)) $$(@F) $(LOG)) 2>&1 | sed 's,^,$$@: ,' | egrep -v 'command line warning #10120'
+	@test -f $$@ || exit 11
 endef
 
 # build/compiler/mode/fms/libfms.a
@@ -226,8 +227,9 @@ define mom6-static-mom-memory
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/$(word 3,$(call slash_to_list,$(5)))/path_names: LIST_PATHS_ARGS += $(5)/
 endef
 define mom6-static-variables
-$(BUILD)/$(1)/$(2)/$(3)/$(4)/%/path_names: LIST_PATHS_ARGS += $(MOM6_SRC)/src/*/ $(MOM6_SRC)/src/*/*/ $(MOM6_SRC)/config_src/solo_driver/
-$(BUILD)/$(1)/$(2)/$(3)/$(4)/%/path_names: $(MOM6_SRC)/src/*/* $(MOM6_SRC)/src/*/*/* $(MOM6_SRC)/config_src/solo_driver/*
+$(BUILD)/$(1)/$(2)/$(3)/$(4)/%/path_names: LIST_PATHS_ARGS += $(MOM6_SRC)/src/*/ $(MOM6_SRC)/src/*/*/
+$(BUILD)/$(1)/$(2)/$(3)/$(4)/%/path_names: $(MOM6_SRC)/src/*/* $(MOM6_SRC)/src/*/*/*
+$(BUILD)/$(1)/$(2)/$(3)/ocean_only/%/path_names: $(MOM6_SRC)/config_src/solo_driver/*
 $(foreach e,$(wildcard $(CONFIGS)/$(4)/*),$(eval $(call mom6-static-mom-memory,$(1),$(2),$(3),$(4),$(e))))
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/%/Makefile: MKMF_OPTS = -p MOM6 -o '-I../../../fms' -l '$$(LIBS)' -c '$$(CPP_DEFS)'
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/%/Makefile: CPP_DEFS += -D_FILE_VERSION="`../../../../../../$(MKMF_SRC)/bin/git-version-string $$$$<`"
@@ -357,5 +359,3 @@ clean_make:
 	find $(BUILD)/ -name "path_names*" -o -name "Makefile" -exec rm {} \;
 clean:
 	rm -rf $(BUILD) 
-
-test: build_gnu build/gnu/repro/static/ocean_only/double_gyre/MOM6
