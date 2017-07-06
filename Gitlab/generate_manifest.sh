@@ -24,7 +24,13 @@ do
     echo $e/12.ignore/ocean.stats.%: NPES=$npes
     echo $e/02.ignore/ocean.stats.%: NPES=$npes
     if [[ "$npes" -gt "1" && "${#masktable}" -eq "0" && "${#atmos_npes}" -eq 0 ]]; then
-      alt_npes=$(($npes-1))
+      if [[ "$npes" -gt "15" ]]; then
+        alt_npes=$(($npes-4))
+      elif [[ "$npes" -gt "5" ]]; then
+        alt_npes=$(($npes-2))
+      else
+        alt_npes=$(($npes-1))
+      fi
       echo $e/ocean.stats.%: ALT_NPES=$alt_npes
     fi
   mom_memory_file=$e/MOM_memory.h

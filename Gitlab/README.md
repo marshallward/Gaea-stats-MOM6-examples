@@ -63,6 +63,12 @@ make -f Gitlab/Makefile.run gnu_static_ocean_only MEMORY=static -s -j
 make -f Gitlab/Makefile.run intel_static_ocean_only MEMORY=static -s -j
 make -f Gitlab/Makefile.run pgi_static_ocean_only MEMORY=static -s -j
 ```
+Test with alternative PE counts
+```bash
+make -f Gitlab/Makefile.run gnu_all -s -j LAYOUT=alt
+make -f Gitlab/Makefile.run intel_all -s -j LAYOUT=alt
+make -f Gitlab/Makefile.run pgi_all -s -j LAYOUT=alt
+```
 
 ## Copy results to regressions/
 ```bash
