@@ -64,13 +64,16 @@ $(foreach c, $(COMPILERS),$(foreach m,$(MODES),$(eval $(call make-env-dep,$c,$m)
 ifeq ($(SITE),ncrc)
 $(BUILD)/gnu/env:
 	mkdir -p $(@D)
-	echo 'module unload PrgEnv-pgi PrgEnv-intel PrgEnv-gnu ; module load PrgEnv-gnu; module unload netcdf gcc; module load gcc/5.3.0 cray-hdf5 cray-netcdf' > $@
+	echo 'source /opt/modules/default/etc/modules.sh ; module use -a /ncrc/home2/fms/local/modulefiles ; MODULEPATH=/opt/cray/ari/modulefiles:/opt/cray/craype/2.4.2/modulefiles:/opt/cray/modulefiles:/opt/modulefiles:/sw/eslogin-c3/modulefiles:/usw/eslogin/modulefiles-c3:/ncrc/home2/fms/local/modulefiles' > $@
+	echo 'module unload PrgEnv-pgi PrgEnv-intel PrgEnv-gnu ; module load PrgEnv-gnu; module unload netcdf gcc; module load gcc/5.3.0 cray-hdf5 cray-netcdf' >> $@
 $(BUILD)/intel/env:
 	mkdir -p $(@D)
-	echo 'module unload PrgEnv-pgi PrgEnv-intel PrgEnv-gnu; module load PrgEnv-intel; module unload netcdf intel; module load intel/16.0.3.210 cray-hdf5 cray-netcdf' > $@
+	echo 'source /opt/modules/default/etc/modules.sh ; module use -a /ncrc/home2/fms/local/modulefiles ; MODULEPATH=/opt/cray/ari/modulefiles:/opt/cray/craype/2.4.2/modulefiles:/opt/cray/modulefiles:/opt/modulefiles:/sw/eslogin-c3/modulefiles:/usw/eslogin/modulefiles-c3:/ncrc/home2/fms/local/modulefiles' > $@
+	echo 'module unload PrgEnv-pgi PrgEnv-intel PrgEnv-gnu; module load PrgEnv-intel; module unload netcdf intel; module load intel/16.0.3.210 cray-hdf5 cray-netcdf' >> $@
 $(BUILD)/pgi/env:
 	mkdir -p $(@D)
-	echo 'module unload PrgEnv-intel ; module load PrgEnv-pgi; module unload netcdf pgi; module load pgi/16.5.0 cray-hdf5 cray-netcdf' > $@
+	echo 'source /opt/modules/default/etc/modules.sh ; module use -a /ncrc/home2/fms/local/modulefiles ; MODULEPATH=/opt/cray/ari/modulefiles:/opt/cray/craype/2.4.2/modulefiles:/opt/cray/modulefiles:/opt/modulefiles:/sw/eslogin-c3/modulefiles:/usw/eslogin/modulefiles-c3:/ncrc/home2/fms/local/modulefiles' > $@
+	echo 'module unload PrgEnv-intel ; module load PrgEnv-pgi; module unload netcdf pgi; module load pgi/16.5.0 cray-hdf5 cray-netcdf' >> $@
 endif
 
 # path_names:
@@ -232,6 +235,7 @@ define mom6-static-variables
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/%/path_names: LIST_PATHS_ARGS += $(MOM6_SRC)/src/*/ $(MOM6_SRC)/src/*/*/
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/%/path_names: $(MOM6_SRC)/src/*/* $(MOM6_SRC)/src/*/*/*
 $(BUILD)/$(1)/$(2)/$(3)/ocean_only/%/path_names: $(MOM6_SRC)/config_src/solo_driver/*
+$(BUILD)/$(1)/$(2)/$(3)/ocean_only/%/path_names: LIST_PATHS_ARGS += $(MOM6_SRC)/config_src/solo_driver/
 $(foreach e,$(wildcard $(CONFIGS)/$(4)/*),$(eval $(call mom6-static-mom-memory,$(1),$(2),$(3),$(4),$(e))))
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/%/Makefile: MKMF_OPTS = -p MOM6 -o '-I../../../fms' -l '$$(LIBS)' -c '$$(CPP_DEFS)'
 $(BUILD)/$(1)/$(2)/$(3)/$(4)/%/Makefile: CPP_DEFS += -D_FILE_VERSION="`../../../../../../$(MKMF_SRC)/bin/git-version-string $$$$<`"
