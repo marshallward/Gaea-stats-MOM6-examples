@@ -61,7 +61,7 @@ run:
     - time tar zxf $CACHE_DIR/build-pgi-repro-$CI_PIPELINE_ID.tgz
     - time tar zxf $CACHE_DIR/build-gnu-debug-$CI_PIPELINE_ID.tgz
     - echo "make -f MRS/Makefile.tests all -B" > job.sh
-    - msub -l partition=c3,nodes=30,walltime=00:35:00,qos=norm -q debug -S /bin/tcsh -j oe -A gfdl_o -z -o log.$CI_PIPELINE_ID -N mom6_full_regression -K job.sh
+    - msub -l partition=c3,nodes=30,walltime=00:40:00,qos=norm -q debug -S /bin/tcsh -j oe -A gfdl_o -z -o log.$CI_PIPELINE_ID -N mom6_full_regression -K job.sh
     - cat log.$CI_PIPELINE_ID
     - time tar zvcf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz *.tar.gz
 
