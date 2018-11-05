@@ -6,7 +6,7 @@ stages:
 
 # Run for all stages
 before_script:
-  - CACHE_DIR=/lustre/f2/scratch/oar.gfdl.ogrp-account/runner/cache/
+  - echo Cache directory set to ${CACHE_DIR:=/lustre/f2/scratch/oar.gfdl.ogrp-account/runner/cache/}
   # Install / update testing scripts
   - git clone https://github.com/adcroft/MRS.git MRS
   # Recursively clone submodules
