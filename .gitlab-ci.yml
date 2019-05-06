@@ -9,7 +9,7 @@ before_script:
   - echo Cache directory set to ${CACHE_DIR:=/lustre/f2/scratch/oar.gfdl.ogrp-account/runner/cache/}
   # Install / update testing scripts
   - git clone https://github.com/adcroft/MRS.git MRS
-  - (cd MRS ; git checkout 9badc63acefbf038)
+  - (cd MRS ; git checkout xanadu-fms)
   # Recursively clone submodules
   - git submodule sync --recursive && git submodule update --init --recursive
   # Clone other components
