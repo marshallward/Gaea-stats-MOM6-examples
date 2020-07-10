@@ -9,7 +9,6 @@ before_script:
   - echo Cache directory set to ${CACHE_DIR:=/lustre/f2/scratch/oar.gfdl.ogrp-account/runner/cache/}
   # Install / update testing scripts
   - git clone https://github.com/adcroft/MRS.git MRS
-  - (cd MRS ; git checkout xanadu-fms)
   # Recursively clone submodules
   - git submodule sync --recursive && git submodule update --init --recursive
   # Clone other components
@@ -21,7 +20,7 @@ before_script:
 gnu:repro:
   stage: builds
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time make -f MRS/Makefile.build build_gnu -s -j
     - time make -f MRS/Makefile.build static_gnu -s -j
@@ -30,7 +29,7 @@ gnu:repro:
 intel:repro:
   stage: builds
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - make -f MRS/Makefile.build build_intel -s -j
     - time tar zvcf $CACHE_DIR/build-intel-repro-$CI_PIPELINE_ID.tgz `find build/intel -name MOM6`
@@ -38,7 +37,7 @@ intel:repro:
 pgi:repro:
   stage: builds
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - make -f MRS/Makefile.build build_pgi -s -j
     - time tar zvcf $CACHE_DIR/build-pgi-repro-$CI_PIPELINE_ID.tgz `find build/pgi -name MOM6`
@@ -46,7 +45,7 @@ pgi:repro:
 gnu:debug:
   stage: builds
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - make -f MRS/Makefile.build debug_gnu -s -j
     - time tar zvcf $CACHE_DIR/build-gnu-debug-$CI_PIPELINE_ID.tgz `find build/gnu -name MOM6`
@@ -55,13 +54,13 @@ gnu:debug:
 run:
   stage: run
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/build-gnu-repro-$CI_PIPELINE_ID.tgz
     - time tar zxf $CACHE_DIR/build-intel-repro-$CI_PIPELINE_ID.tgz
     - time tar zxf $CACHE_DIR/build-pgi-repro-$CI_PIPELINE_ID.tgz
     - time tar zxf $CACHE_DIR/build-gnu-debug-$CI_PIPELINE_ID.tgz
-    - (echo '#!/bin/tcsh';echo 'make -f MRS/Makefile.tests all -B') > job.sh
+    - (echo '#!/bin/tcsh';echo 'make -f MRS/Makefile.tests all') > job.sh
     - sbatch --clusters=c3,c4 --nodes=30 --time=0:42:00 --account=gfdl_o --qos=debug --job-name=mom6_full_regression --output=log.$CI_PIPELINE_ID --wait job.sh
     - cat log.$CI_PIPELINE_ID
     - test -f restart_results_gnu.tar.gz
@@ -71,7 +70,7 @@ run:
 gnu:non-symmetric:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests gnu_non_symmetric
@@ -79,7 +78,7 @@ gnu:non-symmetric:
 intel:non-symmetric:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests intel_non_symmetric
@@ -87,7 +86,7 @@ intel:non-symmetric:
 pgi:non-symmetric:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests pgi_non_symmetric
@@ -95,7 +94,7 @@ pgi:non-symmetric:
 gnu:symmetric:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests gnu_symmetric
@@ -103,7 +102,7 @@ gnu:symmetric:
 intel:symmetric:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests intel_symmetric
@@ -111,7 +110,7 @@ intel:symmetric:
 pgi:symmetric:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests pgi_symmetric
@@ -119,7 +118,7 @@ pgi:symmetric:
 gnu:layout:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests gnu_layout
@@ -127,7 +126,7 @@ gnu:layout:
 intel:layout:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests intel_layout
@@ -135,7 +134,7 @@ intel:layout:
 pgi:layout:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests pgi_layout
@@ -143,7 +142,7 @@ pgi:layout:
 gnu:static:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests gnu_static
@@ -151,7 +150,7 @@ gnu:static:
 gnu:restart:
   stage: tests
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - time tar zxf $CACHE_DIR/results-$CI_PIPELINE_ID.tgz
     - make -f MRS/Makefile.tests gnu_check_restarts
@@ -159,6 +158,6 @@ gnu:restart:
 cleanup:
   stage: cleanup
   tags:
-    - ncrc3
+    - ncrc4
   script:
     - rm $CACHE_DIR/*$CI_PIPELINE_ID.tgz
