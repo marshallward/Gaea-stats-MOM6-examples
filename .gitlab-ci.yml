@@ -51,7 +51,8 @@ results:
   tags:
     - ncrc4
   script:
-    - make -f tools/MRS/Makefile stats-pipeline-test
+    - cd ../regressions ; pwd
+    - make -f ../MOM6-examples/tools/MRS/Makefile stats-pipeline-test
 
 cleanup:
   stage: cleanup
