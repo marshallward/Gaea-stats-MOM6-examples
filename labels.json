@@ -1,6 +1,6 @@
 {
    "gnu": {
-      "version": "gcc/7.3.0"
+      "version": "gcc/9.3.0"
    },
   "intel": {
       "version": "intel/18.0.6.288"
