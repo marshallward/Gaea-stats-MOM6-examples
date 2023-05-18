@@ -19,21 +19,21 @@ before_script:
 gnu:repro:
   stage: builds
   tags:
-    - ncrc4
+    - ncrc5
   script:
     - make -f tools/MRS/Makefile pipeline-build-repro-gnu
 
 intel:repro:
   stage: builds
   tags:
-    - ncrc4
+    - ncrc5
   script:
     - make -f tools/MRS/Makefile pipeline-build-repro-intel
 
 pgi:repro:
   stage: builds
   tags:
-    - ncrc4
+    - ncrc5
   script:
     - make -f tools/MRS/Makefile pipeline-build-repro-pgi
 
@@ -41,7 +41,7 @@ pgi:repro:
 run:
   stage: run
   tags:
-    - ncrc4
+    - ncrc5
   script:
     - make -f tools/MRS/Makefile stats-pipeline-run
 
@@ -49,7 +49,7 @@ run:
 results:
   stage: tests
   tags:
-    - ncrc4
+    - ncrc5
   script:
     - cd ../regressions ; pwd
     - make -f ../MOM6-examples/tools/MRS/Makefile stats-pipeline-test
@@ -57,7 +57,7 @@ results:
 cleanup:
   stage: cleanup
   tags:
-    - ncrc4
+    - ncrc5
   before_script:
     - echo Skipping before-script
   script:
