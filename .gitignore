@@ -1,6 +1,5 @@
 build
 *.ignore
-Makefile
 manifest.mk
 /tmp-MOM6-examples-gnu/
 /tmp-MOM6-examples-intel/
