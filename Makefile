@@ -1,25 +1,39 @@
 #COMPILERS = gnu intel nvidia
 COMPILERS := gnu
-MODES := debug repro
+STATE := debug repro
+LAYOUTS := dynamic_symmetric dynamic_nonsymmetric
+#MODELS := ocean_only ice_ocean_SIS2 coupled_AM2_SIS2_MOM6?
+MODELS := ocean_only
 
 # TODO: Move to config file?
 CC_GNU := gcc
-FC_GNU := gfortran
-FCFLAGS_GNU := -g
-FCFLAGS_GNU_DEBUG := $(FCFLAGS_GNU) -O0
-FCFLAGS_GNU_REPRO := -g -O2
+CFLAGS_GNU := -g
+CFLAGS_GNU_DEBUG := $(CFLAGS_GNU) -O0
+CFLAGS_GNU_REPRO := $(CFLAGS_GNU) -O2
 
-#all: $(foreach COMPILERS,c,$(foreach MODES,m,build/$(c)/$(m)/shared/fms/libFMS.a))
-#all: $(foreach m,$(MODES),build/gnu/$(m)/shared/fms/libFMS.a)
-all: $(foreach m,$(MODES),build/gnu/$(m)/shared/atmos_null/libatmos_null.a)
+FC_GNU := gfortran
+FCFLAGS_GNU := -g -fbacktrace -Waliasing -fno-range-check
+FCFLAGS_GNU_DEBUG := $(FCFLAGS_GNU) -O0 -W -fbounds-check -ffpe-trap=invalid,zero,overflow
+FCFLAGS_GNU_REPRO := $(FCFLAGS_GNU) -O2
+
+
+all: \
+	$(foreach c,$(COMPILERS),\
+	$(foreach s,$(STATE),\
+	$(foreach l,$(LAYOUTS),\
+	$(foreach m,$(MODELS),\
+	build/$(c)/$(s)/$(l)/$(m)/MOM6 \
+	))))
 
 # GNU
 build/gnu/%: CC = $(CC_GNU)
 build/gnu/%: FC = $(FC_GNU)
+build/gnu/debug/%: CFLAGS = $(CFLAGS_GNU_DEBUG)
+build/gnu/repro/%: CFLAGS = $(CFLAGS_GNU_REPRO)
 build/gnu/debug/%: FCFLAGS = $(FCFLAGS_GNU_DEBUG)
 build/gnu/repro/%: FCFLAGS = $(FCFLAGS_GNU_REPRO)
 
-# TODO:
+# TODO: ...?
 # - CPPFLAGS
 # - CFLAGS
 # - LDFLAGS
@@ -32,7 +46,14 @@ build/%: CC_ENV = CC="$(CC)" CFLAGS="$(CFLAGS)"
 build/%: FC_ENV = FC="$(FC)" FCFLAGS="$(FCFLAGS)"
 
 
-build/gnu/debug/dynamic_symmetric/ocean_only/MOM6: build/gnu/debug/shared/fms/libFMS.a
+build/gnu/%/dynamic_symmetric/ocean_only/MOM6: build/gnu/%/shared/fms/libFMS.a
+	$(FC_ENV) \
+	$(MAKE) -C MOM6-examples/ocean_only \
+	  BUILD=../../$(@D) \
+	  FMS_BUILD=../../build/gnu/debug/shared/fms \
+	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_symmetric/MOM_memory.h
+
+build/gnu/%/dynamic_nonsymmetric/ocean_only/MOM6: build/gnu/%/shared/fms/libFMS.a
 	$(FC_ENV) \
 	$(MAKE) -C MOM6-examples/ocean_only \
 	  BUILD=../../$(@D) \
