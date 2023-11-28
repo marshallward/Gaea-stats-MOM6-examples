@@ -1,20 +1,27 @@
-# MOM6-examples Makefile for Gaea
+# Gaea regression testing Makefile
+# (Currently only supports builds)
 
+
+# Build targets
 #COMPILERS = gnu intel nvidia
 COMPILERS := gnu
 STATE := debug repro
 LAYOUTS := dynamic_symmetric dynamic_nonsymmetric
 #MODELS := ocean_only ice_ocean_SIS2 coupled_AM2_SIS2_MOM6?
-MODELS := ocean_only
+MODELS := ocean_only ice_ocean_SIS2
 
+
+# Gaea compiler configuration
 
 # GNU configuration
-CC_GNU := cc
+#CC_GNU := cc
+CC_GNU := gcc
 CFLAGS_GNU := -g
 CFLAGS_GNU_DEBUG := $(CFLAGS_GNU) -O0
 CFLAGS_GNU_REPRO := $(CFLAGS_GNU) -O2
 
-FC_GNU := ftn
+#FC_GNU := ftn
+FC_GNU := gfortran
 FCFLAGS_GNU := -g -fbacktrace -Waliasing -fno-range-check
 FCFLAGS_GNU_DEBUG := $(FCFLAGS_GNU) -O0 -W -fbounds-check \
   -ffpe-trap=invalid,zero,overflow
@@ -86,26 +93,46 @@ build/nvidia/repro/%: FCFLAGS = $(FCFLAGS_NVIDIA_REPRO)
 # - CFLAGS
 # - LDFLAGS
 # ---
-# 	- PYTHON?
+#   - PYTHON?
 #   - LIBS? [Autoconf is supposed to set this]
 #   - MPICC/MPIFC? [Autoconf *should* set this... I think?]
 
 build/%: CC_ENV = CC="$(CC)" CFLAGS="$(CFLAGS)"
 build/%: FC_ENV = FC="$(FC)" FCFLAGS="$(FCFLAGS)"
 
-build/gnu/%/dynamic_symmetric/ocean_only/MOM6: build/gnu/%/shared/fms/libFMS.a
+# Executables
+
+build/%/dynamic_symmetric/ice_ocean_SIS2/MOM6: \
+  build/%/shared/fms/libFMS.a \
+  build/%/shared/atmos_null/libatmos_null.a \
+  build/%/shared/icebergs/libicebergs.a \
+  build/%/shared/ice_param/libice_param.a \
+  build/%/shared/land_null/libland_null.a
+	$(FC_ENV) \
+	$(MAKE) -C MOM6-examples/ice_ocean_SIS2 \
+	  BUILD=../../$(@D) \
+	  FMS_BUILD=../../build/$*/shared/fms \
+	  ATMOS_BUILD=../../build/$*/shared/atmos_null \
+	  ICEBERGS_BUILD=../../build/$*/shared/icebergs \
+	  ICE_PARAM_BUILD=../../build/$*/shared/ice_param \
+	  LAND_BUILD=../../build/$*/shared/land_null
+
+build/%/dynamic_symmetric/ocean_only/MOM6: build/%/shared/fms/libFMS.a
 	$(FC_ENV) \
 	$(MAKE) -C MOM6-examples/ocean_only \
 	  BUILD=../../$(@D) \
-	  FMS_BUILD=../../build/gnu/debug/shared/fms \
+	  FMS_BUILD=../../build/$*/shared/fms \
 	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_symmetric/MOM_memory.h
 
-build/gnu/%/dynamic_nonsymmetric/ocean_only/MOM6: build/gnu/%/shared/fms/libFMS.a
+build/%/dynamic_nonsymmetric/ocean_only/MOM6: build/%/shared/fms/libFMS.a
 	$(FC_ENV) \
 	$(MAKE) -C MOM6-examples/ocean_only \
 	  BUILD=../../$(@D) \
-	  FMS_BUILD=../../build/gnu/debug/shared/fms \
+	  FMS_BUILD=../../build/$*/shared/fms \
 	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_nonsymmetric/MOM_memory.h
+
+
+# Libraries
 
 build/%/fms/libFMS.a:
 	$(CC_ENV) $(FC_ENV) \
