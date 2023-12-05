@@ -6,8 +6,7 @@
 COMPILERS := gnu intel nvidia
 STATE := debug repro
 LAYOUTS := dynamic_symmetric dynamic_nonsymmetric
-#MODELS := ocean_only ice_ocean_SIS2 coupled_AM2_SIS2_MOM6?
-MODELS := ocean_only ice_ocean_SIS2
+MODELS := ocean_only ice_ocean_SIS2 coupled_AM2_LM3_SIS2
 
 
 # Gaea compiler configuration
@@ -102,16 +101,34 @@ build/nvidia/repro/%: FCFLAGS = $(FCFLAGS_NVIDIA_REPRO)
 build/%: CC_ENV = CC="cc" MPICC="cc" CFLAGS="$(CFLAGS)"
 build/%: FC_ENV = FC="ftn" MPIFC="ftn" FCFLAGS="$(FCFLAGS)"
 
+
 # Executables
+
+build/%/dynamic_symmetric/ocean_only/MOM6: \
+  build/%/shared/fms/libFMS.a
+	source $(MODULES) && \
+	$(CC_ENV) $(FC_ENV) \
+	$(MAKE) -C MOM6-examples/ocean_only \
+	  BUILD=../../$(@D) \
+	  FMS_BUILD=../../build/$*/shared/fms
+
+build/%/dynamic_nonsymmetric/ocean_only/MOM6: \
+  build/%/shared/fms/libFMS.a
+	source $(MODULES) && \
+	$(CC_ENV) $(FC_ENV) \
+	$(MAKE) -C MOM6-examples/ocean_only \
+	  BUILD=../../$(@D) \
+	  FMS_BUILD=../../build/$*/shared/fms \
+	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_nonsymmetric/MOM_memory.h
 
 build/%/dynamic_symmetric/ice_ocean_SIS2/MOM6: \
   build/%/shared/fms/libFMS.a \
   build/%/shared/atmos_null/libatmos_null.a \
+  build/%/shared/land_null/libland_null.a \
   build/%/shared/icebergs/libicebergs.a \
-  build/%/shared/ice_param/libice_param.a \
-  build/%/shared/land_null/libland_null.a
+  build/%/shared/ice_param/libice_param.a
 	source $(MODULES) && \
-	$(FC_ENV) \
+	$(CC_ENV) $(FC_ENV) \
 	$(MAKE) -C MOM6-examples/ice_ocean_SIS2 \
 	  BUILD=../../$(@D) \
 	  FMS_BUILD=../../build/$*/shared/fms \
@@ -123,11 +140,11 @@ build/%/dynamic_symmetric/ice_ocean_SIS2/MOM6: \
 build/%/dynamic_nonsymmetric/ice_ocean_SIS2/MOM6: \
   build/%/shared/fms/libFMS.a \
   build/%/shared/atmos_null/libatmos_null.a \
+  build/%/shared/land_null/libland_null.a \
   build/%/shared/icebergs/libicebergs.a \
-  build/%/shared/ice_param/libice_param.a \
-  build/%/shared/land_null/libland_null.a
+  build/%/shared/ice_param/libice_param.a
 	source $(MODULES) && \
-	$(FC_ENV) \
+	$(CC_ENV) $(FC_ENV) \
 	$(MAKE) -C MOM6-examples/ice_ocean_SIS2 \
 	  BUILD=../../$(@D) \
 	  FMS_BUILD=../../build/$*/shared/fms \
@@ -138,23 +155,42 @@ build/%/dynamic_nonsymmetric/ice_ocean_SIS2/MOM6: \
 	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_nonsymmetric/MOM_memory.h \
 	  SIS_MEMORY=../src/SIS2/config_src/dynamic/SIS2_memory.h
 
-build/%/dynamic_symmetric/ocean_only/MOM6: build/%/shared/fms/libFMS.a
+build/%/dynamic_symmetric/coupled_AM2_LM3_SIS2/MOM6: \
+  build/%/shared/fms/libFMS.a \
+  build/%/shared/AM2/libAM2.a \
+  build/%/shared/LM3/libLM3.a \
+  build/%/shared/icebergs/libicebergs.a \
+  build/%/shared/ice_param/libice_param.a
 	source $(MODULES) && \
-	$(FC_ENV) \
-	$(MAKE) -C MOM6-examples/ocean_only \
+	$(CC_ENV) $(FC_ENV) \
+	$(MAKE) -C MOM6-examples/coupled_AM2_LM3_SIS2 \
 	  BUILD=../../$(@D) \
 	  FMS_BUILD=../../build/$*/shared/fms \
-	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_symmetric/MOM_memory.h
+	  AM2_BUILD=../../build/$*/shared/AM2 \
+	  ICEBERGS_BUILD=../../build/$*/shared/icebergs \
+	  ICE_PARAM_BUILD=../../build/$*/shared//ice_param \
+	  LM3_BUILD=../../build/$*/shared/LM3
 
-build/%/dynamic_nonsymmetric/ocean_only/MOM6: build/%/shared/fms/libFMS.a
+build/%/dynamic_nonsymmetric/coupled_AM2_LM3_SIS2/MOM6: \
+  build/%/shared/fms/libFMS.a \
+  build/%/shared/AM2/libAM2.a \
+  build/%/shared/LM3/libLM3.a \
+  build/%/shared/ice_param/libice_param.a \
+  build/%/shared/icebergs/libicebergs.a
 	source $(MODULES) && \
-	$(FC_ENV) \
-	$(MAKE) -C MOM6-examples/ocean_only \
+	$(CC_ENV) $(FC_ENV) \
+	$(MAKE) -C MOM6-examples/coupled_AM2_LM3_SIS2 \
 	  BUILD=../../$(@D) \
 	  FMS_BUILD=../../build/$*/shared/fms \
-	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_nonsymmetric/MOM_memory.h
+	  AM2_BUILD=../../build/$*/shared/AM2 \
+	  ICEBERGS_BUILD=../../build/$*/shared/icebergs \
+	  ICE_PARAM_BUILD=../../build/$*/shared//ice_param \
+	  LM3_BUILD=../../build/$*/shared/LM3 \
+	  MOM_MEMORY=../src/MOM6/config_src/memory/dynamic_nonsymmetric/MOM_memory.h \
+	  SIS_MEMORY=../src/SIS2/config_src/dynamic/SIS2_memory.h
 
 
+#---
 # Libraries
 
 build/%/fms/libFMS.a:
@@ -170,10 +206,24 @@ build/%/atmos_null/libatmos_null.a: build/%/fms/libFMS.a
 	  BUILD=../../../$(@D) \
 	  FMS_BUILD=../../../build/$*/fms
 
+build/%/AM2/libAM2.a: build/%/fms/libFMS.a
+	source $(MODULES) && \
+	$(FC_ENV) \
+	$(MAKE) -C MOM6-examples/shared/AM2 \
+	  BUILD=../../../$(@D) \
+	  FMS_BUILD=../../../build/$*/fms
+
 build/%/land_null/libland_null.a: build/%/fms/libFMS.a
 	source $(MODULES) && \
 	$(FC_ENV) \
 	$(MAKE) -C MOM6-examples/shared/land_null \
+	  BUILD=../../../$(@D) \
+	  FMS_BUILD=../../../build/$*/fms
+
+build/%/LM3/libLM3.a: build/%/fms/libFMS.a
+	source $(MODULES) && \
+	$(FC_ENV) \
+	$(MAKE) -C MOM6-examples/shared/LM3 \
 	  BUILD=../../../$(@D) \
 	  FMS_BUILD=../../../build/$*/fms
 
